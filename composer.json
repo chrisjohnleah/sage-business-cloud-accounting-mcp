@@ -1,0 +1,49 @@
+{
+    "name": "chrisjohnleah/sage-business-cloud-accounting-mcp",
+    "description": "Model Context Protocol (MCP) server for the Sage Business Cloud Accounting API — exposes Sage accounting data and actions as tools for AI agents.",
+    "keywords": ["sage", "accounting", "mcp", "model-context-protocol", "ai", "agents", "sage-business-cloud", "api"],
+    "homepage": "https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Chris John Leah",
+            "email": "christopher.leah@happywebs.co.uk"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "chrisjohnleah/sage-business-cloud-accounting-api": "^0.1"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.18",
+        "pestphp/pest": "^3.0 || ^4.0",
+        "phpstan/phpstan": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ChrisJohnLeah\\SageAccounting\\Mcp\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ChrisJohnLeah\\SageAccounting\\Mcp\\Tests\\": "tests/"
+        }
+    },
+    "bin": ["bin/sage-mcp"],
+    "scripts": {
+        "test": "pest",
+        "analyse": "phpstan analyse",
+        "format": "pint",
+        "lint": "pint --test",
+        "check": ["@lint", "@analyse", "@test"]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
