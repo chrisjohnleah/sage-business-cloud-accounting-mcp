@@ -64,3 +64,20 @@ it('treats a bare code as the code with no state', function () {
 it('returns nulls for empty input', function () {
     expect(ConnectCommand::parseCodeAndState('   '))->toBe([null, null]);
 });
+
+it('resolves the loopback port from --port, env, then default', function () {
+    putenv('SAGE_MCP_CALLBACK_PORT');
+
+    expect(ConnectCommand::resolvePort(['--port=9000']))->toBe(9000)
+        ->and(ConnectCommand::resolvePort([]))->toBe(8765);
+
+    putenv('SAGE_MCP_CALLBACK_PORT=7000');
+    expect(ConnectCommand::resolvePort([]))->toBe(7000);
+    putenv('SAGE_MCP_CALLBACK_PORT');
+});
+
+it('picks the first non-flag argument as the code', function () {
+    expect(ConnectCommand::firstPositional(['--manual', 'CODE123']))->toBe('CODE123')
+        ->and(ConnectCommand::firstPositional(['--manual', '--port=1']))->toBeNull()
+        ->and(ConnectCommand::firstPositional([]))->toBeNull();
+});

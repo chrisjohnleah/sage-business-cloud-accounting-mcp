@@ -40,11 +40,12 @@ try {
     }
 
     if ($command === 'connect') {
-        // `sage-mcp connect` (interactive) or `sage-mcp connect <code-or-redirect-url>`.
-        exit(ConnectCommand::run($argv[2] ?? null));
+        // `sage-mcp connect` (loopback, default), `connect --manual`,
+        // `connect --port=N`, or `connect <code-or-redirect-url>`.
+        exit(ConnectCommand::run(array_slice($argv, 2)));
     }
 
-    fwrite(STDERR, "Unknown command '{$command}'. Usage: sage-mcp [connect [code|redirect-url]]\n");
+    fwrite(STDERR, "Unknown command '{$command}'. Usage: sage-mcp [connect [--manual] [--port=N] [code|redirect-url]]\n");
     exit(1);
 } catch (Throwable $exception) {
     fwrite(STDERR, 'Fatal: '.$exception->getMessage()."\n");

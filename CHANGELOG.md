@@ -5,6 +5,13 @@ and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-14
+
+### Added
+- `connect` now defaults to an RFC 8252 loopback redirect (like `gcloud`/`gh`): it starts a temporary `http://127.0.0.1:8765/callback` listener (`LoopbackServer`), opens the browser, and catches the authorization code automatically — the redirect no longer needs to hit a production web callback, and there is no copy-paste. Port configurable via `--port=N` / `SAGE_MCP_CALLBACK_PORT`.
+- `connect --manual` (print URL, paste code/redirect URL) and `connect <code|url>` (non-interactive) retained as fallbacks.
+- `SageClientFactory::fromEnvironment()` accepts an optional redirect-URI override (used by the loopback connect flow).
+
 ## [0.1.0] - 2026-06-14
 
 ### Added
@@ -19,5 +26,6 @@ and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Pest tests for every tool, the connect flow, and tool gating, using a Saloon `MockClient` to fake the HTTP layer.
 - CI (Pint + PHPStan + Pest) on PHP 8.3 and 8.4.
 
-[Unreleased]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/releases/tag/v0.1.0

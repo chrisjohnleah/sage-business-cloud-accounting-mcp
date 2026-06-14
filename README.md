@@ -50,16 +50,32 @@ Authorise the server against your Sage account once. The token is cached via
 php vendor/bin/sage-mcp connect
 ```
 
-The command prints a Sage authorization URL. Open it, sign in, and approve
-access. Sage redirects to your `SAGE_REDIRECT_URI` with a `?code=...` parameter —
-paste the full redirect URL (or just the code) back into the prompt. The server
-exchanges the code for tokens, stores them, and resolves your business id so all
-later calls target the right company.
+By default `connect` uses an **RFC 8252 loopback redirect** — the same pattern
+`gcloud auth login` and `gh auth login` use. It starts a temporary listener on
+`http://127.0.0.1:8765/callback`, opens your browser, and catches the
+authorization code there automatically. The redirect never touches a production
+web callback, and there is nothing to copy-paste. (Claude Code does not broker
+OAuth for stdio MCP servers, so the server owns this flow.)
 
-To enable the write tools, authorise with `SAGE_SCOPES=full_access` set before
-running `connect` (see [Tools](#tools)).
+**One-time setup:** register the loopback redirect URI **exactly** in your Sage
+Developer app (Sage requires an exact match):
 
-Once connected, the cached token is refreshed automatically on each call.
+```
+http://127.0.0.1:8765/callback
+```
+
+Change the port with `--port=N` or `SAGE_MCP_CALLBACK_PORT` (register a matching
+URI). To enable the write tools, set `SAGE_SCOPES=full_access` before connecting
+(see [Tools](#tools)). After connecting, the cached token refreshes automatically.
+
+**Alternatives**
+
+```bash
+php vendor/bin/sage-mcp connect --manual         # print URL, paste the redirect URL/code back
+php vendor/bin/sage-mcp connect "<code-or-url>"   # exchange a code non-interactively
+```
+
+`--manual` uses your configured `SAGE_REDIRECT_URI` instead of the loopback.
 
 ## Registering with an MCP client
 

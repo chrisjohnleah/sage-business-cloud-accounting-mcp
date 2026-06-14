@@ -16,14 +16,14 @@ use RuntimeException;
  */
 final class SageClientFactory
 {
-    public static function fromEnvironment(?TokenStore $tokenStore = null): Sage
+    public static function fromEnvironment(?TokenStore $tokenStore = null, ?string $redirectUri = null): Sage
     {
         $tokenStore ??= new FileTokenStore(self::tokenPath());
 
         $connector = new SageConnector(
             clientId: self::env('SAGE_CLIENT_ID', required: true),
             clientSecret: self::env('SAGE_CLIENT_SECRET', required: true),
-            redirectUri: self::env('SAGE_REDIRECT_URI', required: true),
+            redirectUri: $redirectUri ?? self::env('SAGE_REDIRECT_URI', required: true),
             scopes: self::scopes(),
             baseUrl: self::env('SAGE_API_BASE_URL', default: 'https://api.accounting.sage.com/v3.1'),
             authorizeEndpoint: self::env('SAGE_AUTHORIZE_ENDPOINT', default: 'https://www.sageone.com/oauth2/auth/central'),
