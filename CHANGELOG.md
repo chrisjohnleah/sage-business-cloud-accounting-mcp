@@ -5,6 +5,8 @@ and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-06-14
+
 ### Added
 - Working stdio MCP server built on [`php-mcp/server`](https://github.com/php-mcp/server) (`Server::run()` / `Server::build()`), exposing Sage Accounting as agent tools.
 - Read tools: `list_contacts`, `list_purchase_invoices` (both with filters and a bounded `limit`), and `get_business`.
@@ -17,4 +19,5 @@ and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Pest tests for every tool, the connect flow, and tool gating, using a Saloon `MockClient` to fake the HTTP layer.
 - CI (Pint + PHPStan + Pest) on PHP 8.3 and 8.4.
 
-[Unreleased]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/commits/main
+[Unreleased]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/releases/tag/v0.1.0
