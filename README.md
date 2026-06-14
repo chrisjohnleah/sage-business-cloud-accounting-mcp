@@ -42,7 +42,22 @@ The token is cached as a single JSON file (see `FileTokenStore`), so the server 
 
 ## Connecting (one-time OAuth)
 
-> Connect command pending implementation — see `HANDOFF.md`.
+Authorise the server against your Sage account once. The token is cached via
+`FileTokenStore` and refreshed automatically on every subsequent call.
+
+```bash
+# Reads the same SAGE_* environment variables as the server.
+php vendor/bin/sage-mcp connect
+```
+
+The command prints a Sage authorization URL. Open it, sign in, and approve
+access. Sage redirects to your `SAGE_REDIRECT_URI` with a `?code=...` parameter —
+paste the full redirect URL (or just the code) back into the prompt. The server
+exchanges the code for tokens, stores them, and resolves your business id so all
+later calls target the right company.
+
+To enable the write tools, authorise with `SAGE_SCOPES=full_access` set before
+running `connect` (see [Tools](#tools)).
 
 Once connected, the cached token is refreshed automatically on each call.
 
@@ -69,7 +84,25 @@ Add the server to your client's MCP config (Claude Desktop example):
 
 ## Tools
 
-> Tool surface pending implementation. The first example (`ListContactsTool`) shows the shape; planned tools include `list_contacts`, `list_purchase_invoices`, and `get_business`.
+All tools operate on the connected business (see [Connecting](#connecting-one-time-oauth)). Results are returned as JSON.
+
+**Read — always available:**
+
+| Tool | Description |
+| --- | --- |
+| `list_contacts` | List contacts (customers and suppliers). Filters: `updated_or_created_since`, `search`, `email`, `contact_type_id`, `limit`. |
+| `list_purchase_invoices` | List purchase (supplier) invoices. Filters: `updated_or_created_since`, `status_id`, `contact_id`, `from_date`, `to_date`, `limit`. |
+| `get_business` | Get the connected business (id, name, address, contact details). |
+
+**Write — only registered when `SAGE_SCOPES=full_access`:**
+
+| Tool | Description |
+| --- | --- |
+| `create_contact` | Create a contact. Required: `name`, `contact_type_id` (`CUSTOMER` or `VENDOR`). Optional: `reference`, `email`, `tax_number`, `notes`. |
+| `create_purchase_invoice` | Create a purchase (supplier) invoice. Required: `contact_id`, `date`, `invoice_lines`. Optional: `due_date`, `reference`, `vendor_reference`, `notes`. |
+
+Write tools are omitted from the tool list entirely unless `full_access` is in
+`SAGE_SCOPES`, so a read-only deployment can never mutate Sage data.
 
 ## Testing
 

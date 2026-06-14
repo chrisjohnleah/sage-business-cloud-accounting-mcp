@@ -7,6 +7,7 @@ namespace ChrisJohnLeah\SageAccounting\Mcp;
 use ChrisJohnLeah\SageAccounting\Auth\StoredToken;
 use ChrisJohnLeah\SageAccounting\Contracts\TokenStore;
 use DateTimeImmutable;
+use Exception;
 use JsonException;
 use RuntimeException;
 
@@ -48,9 +49,16 @@ final class FileTokenStore implements TokenStore
         }
 
         $expiresAtRaw = $data['expires_at'] ?? null;
-        $expiresAt = is_string($expiresAtRaw) && $expiresAtRaw !== ''
-            ? new DateTimeImmutable($expiresAtRaw)
-            : null;
+
+        if (is_string($expiresAtRaw) && $expiresAtRaw !== '') {
+            try {
+                $expiresAt = new DateTimeImmutable($expiresAtRaw);
+            } catch (Exception $e) {
+                throw new RuntimeException("Corrupt Sage token file at {$this->path}: {$e->getMessage()}", 0, $e);
+            }
+        } else {
+            $expiresAt = null;
+        }
 
         $businessId = $data['business_id'] ?? null;
 

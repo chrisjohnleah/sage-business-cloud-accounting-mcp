@@ -3,19 +3,50 @@
 
 declare(strict_types=1);
 
+use ChrisJohnLeah\SageAccounting\Mcp\ConnectCommand;
 use ChrisJohnLeah\SageAccounting\Mcp\Server;
 
-$autoloaders = [
+// Under the stdio transport, STDOUT is reserved exclusively for JSON-RPC framing.
+// Route every PHP engine diagnostic (warnings, notices, deprecations, uncaught
+// fatals) to STDERR so they can never corrupt the protocol stream.
+ini_set('display_errors', 'stderr');
+
+$autoloaded = false;
+
+foreach ([
     __DIR__.'/../vendor/autoload.php',   // installed standalone
     __DIR__.'/../../../autoload.php',    // installed as a dependency
-];
-
-foreach ($autoloaders as $autoloader) {
+] as $autoloader) {
     if (is_file($autoloader)) {
         require $autoloader;
+        $autoloaded = true;
 
         break;
     }
 }
 
-Server::run();
+if (! $autoloaded) {
+    fwrite(STDERR, "Could not locate the Composer autoloader. Run `composer install` first.\n");
+    exit(1);
+}
+
+$command = $argv[1] ?? null;
+
+try {
+    if ($command === null) {
+        // Default: serve the MCP tools over stdio (blocks until the stream closes).
+        Server::run();
+        exit(0);
+    }
+
+    if ($command === 'connect') {
+        // `sage-mcp connect` (interactive) or `sage-mcp connect <code-or-redirect-url>`.
+        exit(ConnectCommand::run($argv[2] ?? null));
+    }
+
+    fwrite(STDERR, "Unknown command '{$command}'. Usage: sage-mcp [connect [code|redirect-url]]\n");
+    exit(1);
+} catch (Throwable $exception) {
+    fwrite(STDERR, 'Fatal: '.$exception->getMessage()."\n");
+    exit(1);
+}

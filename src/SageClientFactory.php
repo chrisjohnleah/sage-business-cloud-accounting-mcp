@@ -33,6 +33,15 @@ final class SageClientFactory
         return new Sage($connector, $tokenStore, self::refreshBuffer());
     }
 
+    /**
+     * Whether the configured scopes grant write access. Write tools are only
+     * registered when this is true.
+     */
+    public static function hasFullAccess(): bool
+    {
+        return in_array('full_access', self::scopes(), true);
+    }
+
     public static function tokenPath(): string
     {
         $configured = getenv('SAGE_MCP_TOKEN_PATH');

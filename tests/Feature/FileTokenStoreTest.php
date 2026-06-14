@@ -45,3 +45,39 @@ it('persists a token, overwrites on put, and forgets it', function () {
 
     expect($store->get())->toBeNull();
 });
+
+it('throws a clear error on a corrupt token file', function () {
+    $path = tempTokenPath();
+    @mkdir(dirname($path), 0700, true);
+    file_put_contents($path, '{ this is not valid json');
+
+    $store = new FileTokenStore($path);
+
+    expect(fn () => $store->get())->toThrow(RuntimeException::class, 'Corrupt Sage token file');
+});
+
+it('throws a clear error when expires_at is unparseable', function () {
+    $path = tempTokenPath();
+    @mkdir(dirname($path), 0700, true);
+    file_put_contents($path, json_encode([
+        'access_token' => 'a',
+        'refresh_token' => 'r',
+        'expires_at' => 'not-a-date',
+    ]));
+
+    $store = new FileTokenStore($path);
+
+    expect(fn () => $store->get())->toThrow(RuntimeException::class, 'Corrupt Sage token file');
+});
+
+it('writes the token file with owner-only permissions on POSIX systems', function () {
+    if (DIRECTORY_SEPARATOR !== '/') {
+        $this->markTestSkipped('chmod is a no-op on Windows.');
+    }
+
+    $path = tempTokenPath();
+    $store = new FileTokenStore($path);
+    $store->put(new StoredToken(accessToken: 'a', refreshToken: 'r'));
+
+    expect(substr(sprintf('%o', fileperms($path)), -4))->toBe('0600');
+});
