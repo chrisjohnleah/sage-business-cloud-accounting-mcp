@@ -5,6 +5,11 @@ and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **HTTP mode with native OAuth** (`sage-mcp serve`): an OAuth-protected Streamable HTTP MCP server that is its own OAuth 2.1 authorization server — RFC 9728 protected-resource + RFC 8414 authorization-server discovery, RFC 7591 dynamic client registration, PKCE (S256) — **bridging to Sage**, so MCP clients show and drive the native Authenticate / Re-authenticate flow. Configure with `{"type":"http","url":"http://127.0.0.1:8765/mcp"}`.
+- New `Http\` layer: `HttpServer` (ReactPHP), `Router`, `McpHandler` (drives php-mcp's dispatcher in JSON mode — no SSE), `HttpResult`, and `Http\OAuth\` (`Pkce`, `OAuthStore`, `Metadata`, `AuthorizationServer`, `SageBridge`).
+- `SageClientFactory::oauthStatePath()` for OAuth server state; `SAGE_MCP_HTTP_HOST` / `SAGE_MCP_HTTP_PORT` / `SAGE_MCP_OAUTH_PATH` env vars.
+
 ## [0.3.0] - 2026-06-14
 
 ### Added

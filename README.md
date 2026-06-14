@@ -103,6 +103,48 @@ Add the server to your client's MCP config (Claude Desktop example):
 }
 ```
 
+## HTTP mode — native OAuth re-authentication
+
+By default this is a **stdio** server (above), which Claude Code cannot show an
+"Authenticate / Re-authenticate" action for — it can only "Reconnect". If you
+want the native OAuth experience, run it as an **HTTP server** instead. It then
+acts as its own OAuth 2.1 authorization server (with discovery metadata, dynamic
+client registration, and PKCE) that **bridges to Sage**, so Claude Code drives
+the whole authenticate / re-authenticate flow.
+
+Run it as a persistent service (it is *not* spawned by the client):
+
+```bash
+php vendor/bin/sage-mcp serve        # listens on http://127.0.0.1:8765 by default
+# SAGE_MCP_HTTP_HOST / SAGE_MCP_HTTP_PORT to change the address.
+```
+
+**One-time setup:** register this redirect URI **exactly** in your Sage Developer app:
+
+```
+http://127.0.0.1:8765/sage/callback
+```
+
+Point your MCP client at the HTTP endpoint (note `type` and `url` — no `command`):
+
+```json
+{
+  "mcpServers": {
+    "sage": {
+      "type": "http",
+      "url": "http://127.0.0.1:8765/mcp"
+    }
+  }
+}
+```
+
+The server still reads `SAGE_CLIENT_ID` / `SAGE_CLIENT_SECRET` from its
+environment. In the client, choose **Authenticate**: your browser opens to Sage,
+you approve, and the server stores the connection — no separate `connect` step.
+The bearer tokens it issues only gate the MCP endpoint; the Sage tokens live in
+the usual token store. OAuth server state is kept in `SAGE_MCP_OAUTH_PATH`
+(defaults next to the token file).
+
 ## Tools
 
 All tools operate on the connected business (see [Connecting](#connecting-one-time-oauth)). Results are returned as JSON.

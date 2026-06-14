@@ -44,7 +44,21 @@ final class SageClientFactory
 
     public static function tokenPath(): string
     {
-        $configured = getenv('SAGE_MCP_TOKEN_PATH');
+        return self::configPath('SAGE_MCP_TOKEN_PATH', 'token.json');
+    }
+
+    /**
+     * Where the HTTP server's OAuth authorization-server state (clients, codes,
+     * issued tokens) is persisted. Defaults next to the Sage token.
+     */
+    public static function oauthStatePath(): string
+    {
+        return self::configPath('SAGE_MCP_OAUTH_PATH', 'oauth-state.json');
+    }
+
+    private static function configPath(string $envKey, string $defaultFile): string
+    {
+        $configured = getenv($envKey);
 
         if (is_string($configured) && $configured !== '') {
             return $configured;
@@ -52,7 +66,7 @@ final class SageClientFactory
 
         $home = getenv('HOME') ?: getenv('USERPROFILE') ?: sys_get_temp_dir();
 
-        return rtrim((string) $home, '/\\').'/.config/sage-mcp/token.json';
+        return rtrim((string) $home, '/\\')."/.config/sage-mcp/{$defaultFile}";
     }
 
     /**
