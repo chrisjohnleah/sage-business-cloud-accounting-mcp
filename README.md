@@ -57,6 +57,11 @@ authorization code there automatically. The redirect never touches a production
 web callback, and there is nothing to copy-paste. (Claude Code does not broker
 OAuth for stdio MCP servers, so the server owns this flow.)
 
+> **From inside your MCP client:** you don't need a terminal — just invoke the
+> **`sage_connect`** tool (e.g. ask the agent to "connect to Sage"). It runs the
+> same loopback flow, opens your browser, and saves the token. Call it whenever a
+> Sage tool reports it's not connected.
+
 **One-time setup:** register the loopback redirect URI **exactly** in your Sage
 Developer app (Sage requires an exact match):
 
@@ -109,6 +114,7 @@ All tools operate on the connected business (see [Connecting](#connecting-one-ti
 | `list_contacts` | List contacts (customers and suppliers). Filters: `updated_or_created_since`, `search`, `email`, `contact_type_id`, `limit`. |
 | `list_purchase_invoices` | List purchase (supplier) invoices. Filters: `updated_or_created_since`, `status_id`, `contact_id`, `from_date`, `to_date`, `limit`. |
 | `get_business` | Get the connected business (id, name, address, contact details). |
+| `sage_connect` | Authenticate/re-authenticate to Sage (opens your browser, loopback OAuth). Call this if a tool reports it's not connected. |
 
 **Write — only registered when `SAGE_SCOPES=full_access`:**
 

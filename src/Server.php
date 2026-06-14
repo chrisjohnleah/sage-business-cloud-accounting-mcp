@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChrisJohnLeah\SageAccounting\Mcp;
 
 use ChrisJohnLeah\SageAccounting\Mcp\Support\StderrLogger;
+use ChrisJohnLeah\SageAccounting\Mcp\Tools\ConnectTool;
 use ChrisJohnLeah\SageAccounting\Mcp\Tools\CreateContactTool;
 use ChrisJohnLeah\SageAccounting\Mcp\Tools\CreatePurchaseInvoiceTool;
 use ChrisJohnLeah\SageAccounting\Mcp\Tools\GetBusinessTool;
@@ -72,6 +73,11 @@ final class Server
                 [GetBusinessTool::class, 'handle'],
                 name: 'get_business',
                 description: 'Get the Sage business this server is connected to (the active business).',
+            )
+            ->withTool(
+                [ConnectTool::class, 'handle'],
+                name: 'sage_connect',
+                description: 'Authenticate (or re-authenticate) to Sage via OAuth — opens your browser and captures the result on a localhost loopback. Call this if other Sage tools report no token / not connected.',
             );
 
         if ($fullAccess) {

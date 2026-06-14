@@ -14,7 +14,8 @@ it('builds a server and registers the read tools', function () {
 
     expect($registry->getTool('list_contacts'))->not->toBeNull()
         ->and($registry->getTool('list_purchase_invoices'))->not->toBeNull()
-        ->and($registry->getTool('get_business'))->not->toBeNull();
+        ->and($registry->getTool('get_business'))->not->toBeNull()
+        ->and($registry->getTool('sage_connect'))->not->toBeNull();
 });
 
 it('omits write tools when full access is not granted', function () {

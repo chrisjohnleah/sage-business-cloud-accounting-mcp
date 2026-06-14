@@ -5,6 +5,12 @@ and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-14
+
+### Added
+- `sage_connect` MCP tool — authenticate/re-authenticate to Sage from inside the MCP client (no terminal): runs the loopback OAuth flow, opens the browser, captures the code, and persists the token. Surfaced so an agent can self-heal when other tools report "not connected".
+- `LoopbackConnector` — shared loopback OAuth orchestration used by both the `connect` CLI command and the `sage_connect` tool.
+
 ## [0.2.0] - 2026-06-14
 
 ### Added
@@ -26,6 +32,7 @@ and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Pest tests for every tool, the connect flow, and tool gating, using a Saloon `MockClient` to fake the HTTP layer.
 - CI (Pint + PHPStan + Pest) on PHP 8.3 and 8.4.
 
-[Unreleased]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/chrisjohnleah/sage-business-cloud-accounting-mcp/releases/tag/v0.1.0

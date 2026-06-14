@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace ChrisJohnLeah\SageAccounting\Mcp;
 
 use ChrisJohnLeah\SageAccounting\Data\Business;
-use ChrisJohnLeah\SageAccounting\Mcp\Support\LoopbackServer;
+use ChrisJohnLeah\SageAccounting\Mcp\Support\LoopbackConnector;
 use ChrisJohnLeah\SageAccounting\Sage;
-use RuntimeException;
 use Throwable;
 
 /**
@@ -56,38 +55,24 @@ final class ConnectCommand
     private static function runLoopback(int $port): int
     {
         try {
-            $listener = new LoopbackServer('127.0.0.1', $port);
-        } catch (RuntimeException $exception) {
-            fwrite(STDERR, $exception->getMessage()."\n");
-
-            return 1;
-        }
-
-        $redirect = $listener->redirectUri();
-        $sage = SageClientFactory::fromEnvironment(null, $redirect);
-
-        try {
-            $url = $sage->authorizationUrl();
-            $expectedState = $sage->generatedState();
-
-            fwrite(STDOUT, "Register this redirect URI in your Sage Developer app (exact match required):\n\n  {$redirect}\n\n");
-            fwrite(STDOUT, "Opening your browser to authorise Sage. If it does not open, visit:\n\n  {$url}\n\n");
-            self::openBrowser($url);
-            fwrite(STDOUT, "Listening on {$redirect} for the redirect…\n");
-
-            $callback = $listener->awaitCode(self::CALLBACK_TIMEOUT_SECONDS);
-            $business = self::exchange($sage, $callback['code'], $callback['state'], $expectedState);
-
-            self::reportSuccess($business);
-
-            return 0;
+            $result = LoopbackConnector::connect(
+                $port,
+                self::CALLBACK_TIMEOUT_SECONDS,
+                static function (string $authUrl, string $redirectUri): void {
+                    fwrite(STDOUT, "Register this redirect URI in your Sage Developer app (exact match required):\n\n  {$redirectUri}\n\n");
+                    fwrite(STDOUT, "Opening your browser to authorise Sage. If it does not open, visit:\n\n  {$authUrl}\n\n");
+                    fwrite(STDOUT, "Listening on {$redirectUri} for the redirect…\n");
+                },
+            );
         } catch (Throwable $exception) {
             fwrite(STDERR, 'Failed to connect to Sage: '.$exception->getMessage()."\n");
 
             return 1;
-        } finally {
-            $listener->close();
         }
+
+        self::reportSuccess($result['business']);
+
+        return 0;
     }
 
     /**
@@ -268,23 +253,6 @@ final class ConnectCommand
             fwrite(STDOUT, "Active business: {$label}\n");
         } else {
             fwrite(STDOUT, "Warning: connected, but no accessible business was found for this account.\n");
-        }
-    }
-
-    private static function openBrowser(string $url): void
-    {
-        $argument = escapeshellarg($url);
-
-        $command = match (PHP_OS_FAMILY) {
-            'Darwin' => "open {$argument}",
-            'Windows' => "start \"\" {$argument}",
-            default => "xdg-open {$argument}",
-        };
-
-        if (PHP_OS_FAMILY === 'Windows') {
-            @exec($command);
-        } else {
-            @exec($command.' > /dev/null 2>&1 &');
         }
     }
 
